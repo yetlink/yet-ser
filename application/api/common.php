@@ -111,3 +111,11 @@ function isFloat ($value)
 {
     return is_numeric($value) && is_float($value + 0) && ($value + 0) >= 0;
 }
+
+function stamp2date ($timeStamp) {
+    return date('Y-m-d H:i:s', $timeStamp);
+}
+
+function date2stamp ($date) {
+    return strtotime($date);
+}

@@ -73,7 +73,7 @@ class BaseValidate extends Validate
     }
 
     protected function isTimestamp($value, $rule='', $data='', $field='') {
-        if(strtotime(date('Y-m-d H:i:s', $value)) == $value) {
+        if(date2stamp(stamp2date($value)) == $value) {
             return true;
         }
         return $field . '必须是时间戳';

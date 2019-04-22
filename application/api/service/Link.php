@@ -98,7 +98,7 @@ class Link extends BaseService
         if ($link['password']) {
             throw new MissException(['msg' => '短地址已加密!']);
         }
-        if (strtotime($link['expire_time']) < time()) {
+        if (date2stamp($link['expire_time']) < time()) {
             throw new MissException(['msg' => '短地址已过期!']);
         }
         return $link;
@@ -119,7 +119,7 @@ class Link extends BaseService
         if (!$link) {
             throw new MissException(['msg' => '密码错误，请重试!']);
         }
-        if (strtotime($link['expire_time']) < time()) {
+        if (date2stamp($link['expire_time']) < time()) {
             throw new MissException(['msg' => '短地址已过期!']);
         }
         Record::record($code);
@@ -144,7 +144,7 @@ class Link extends BaseService
         $time = time();
         $link->each(function ($item) use ($time) {
             $item->hidden(['update_time', 'delete_time', 'token'], true);
-            $item['status'] = strtotime($item['expire_time']) > $time;
+            $item['status'] = date2stamp($item['expire_time']) > $time;
         });
         return $link;
     }
@@ -168,7 +168,7 @@ class Link extends BaseService
             'token'  =>         $token,
             'code' =>           $code,
             'password' =>       $password,
-            'expire_time' =>    date('Y-m-d H:i:s', $expire)
+            'expire_time' =>    stamp2date($expire)
         ]);
         $link->save();
         return $link;

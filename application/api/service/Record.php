@@ -38,14 +38,21 @@ class Record extends BaseService
      * 获取短地址统计数据
      * @access public
      * @param  string     $code         短地址
+     * @param  int     $start           开始时间
+     * @param  int     $end             结束时间
      * @return mixed                    短地址
      * @throws
      */
-    public function getLinkRecord($code)
+    public function getLinkRecord($code, $start, $end)
     {
         $token = $this->getToken();
         $linkModel = new LinkModel();
-        $link = $linkModel->where('token', '=' , $token)->where('code', '=' , $code)->with('recordList')->find();
+        $link = $linkModel->where('token', '=' , $token)->where('code', '=' , $code)->with([
+            'recordList' => function ($query) use ($start, $end) {
+                return $query->where('create_time', '>' , stamp2date($start))
+                    ->where('create_time', '<' , stamp2date($end));
+            }
+        ])->find();
         return $this->recordCount($link['recordList']);
     }
 
@@ -64,15 +71,15 @@ class Record extends BaseService
         $pv = count($list); // 次数
         $uv = []; // 一天次数
         $ip = []; // 用户
-        foreach ($list as $item)
+        foreach ($list as $k => $item)
         {
             if (isset($browser[$item['browser']])) {
                 $browser[$item['browser']]['count']++;
             }
             if (isset($os[$item['os']])) {
-                $browser[$item['os']]['count']++;
+                $os[$item['os']]['count']++;
             }
-            $v = date('Y-m-d',strtotime($item['create_time']));
+            $v = date('Y-m-d', date2stamp($item['create_time']));
             $uv[$item['ip'].'_'.$v] = true;
             $ip[$item['ip']] = true;
 

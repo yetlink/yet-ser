@@ -14,6 +14,7 @@ use app\api\validate\IdValid;
 use app\api\validate\UrlValid;
 use app\api\validate\CodeValid;
 use app\api\validate\ExpireValid;
+use app\api\validate\DateRangeValid;
 use app\api\validate\PagingParameter;
 
 class Yet extends BaseController
@@ -61,8 +62,11 @@ class Yet extends BaseController
     public function getLinkRecord($code = '')
     {
         (new CodeValid())->goCheck();
+        $val = new DateRangeValid();
+        $val->goCheck();
+        $date = $val->getDataByRule(input('get.'));
         $service = new RecordService();
-        return $service->getLinkRecord($code);
+        return $service->getLinkRecord($code, $date['date_start'], $date['date_end']);
     }
 
     // 修改短地址
